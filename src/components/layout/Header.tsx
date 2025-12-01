@@ -15,21 +15,24 @@ export default function Header({
   const navigate = useNavigate();
 
   return (
-    <header className="bg-primary text-white shadow-md">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between">
+    <header className="bg-primary text-light w-full">
+      <div className="container mx-auto px-4 py-8 md:pt-8 md:pb-10">
+        {/* Stack on mobile, row on md+. md:items-end will align the Navbar to the bottom of the logo block */}
+        <div className="flex items-center md:items-end justify-between gap-4">
           {/* Logo */}
           <div
             onClick={() => navigate(isAuthenticated ? "/dashboard" : "/")}
-            className="cursor-pointer"
+            className="cursor-pointer max-w-full"
           >
-            <h1 className="font-display text-3xl font-black">Savory</h1>
-            <p className="text-xs opacity-90">Your personal Recipe Manager</p>
+            <h1 className="font-display text-6xl font-black italic">Savory</h1>
+            <p className="text-xs pt-1">Your personal Recipe Manager</p>
           </div>
 
           {/* Navigation - only show when authenticated */}
           {isAuthenticated && (
-            <Navbar userName={userName} onLogout={onLogout} />
+            <div className="self-center md:self-end">
+              <Navbar userName={userName} onLogout={onLogout} />
+            </div>
           )}
         </div>
       </div>
