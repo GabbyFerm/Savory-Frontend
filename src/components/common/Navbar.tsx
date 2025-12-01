@@ -15,10 +15,16 @@ export default function Navbar({ userName, onLogout }: NavbarProps) {
       isActive ? "text-secondary" : "text-light hover:text-secondary"
     }`;
 
+  const mobileNavLinkClass = ({ isActive }: { isActive: boolean }) =>
+    `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+      isActive
+        ? "bg-light/10 text-secondary font-semibold"
+        : "text-light hover:bg-light/10"
+    }`;
+
   return (
-    // relative so the mobile menu can be positioned absolutely (overlay)
     <div className="relative">
-      {/* Desktop nav: align items to the bottom so icons/labels sit on the same baseline as the tagline */}
+      {/* Desktop Navigation */}
       <nav className="hidden md:flex items-end gap-2">
         <NavLink to="/dashboard" className={navLinkClass}>
           <Home size={20} />
@@ -52,72 +58,107 @@ export default function Navbar({ userName, onLogout }: NavbarProps) {
         )}
       </nav>
 
-      {/* Mobile: hamburger visible on small screens and stays on the same header row */}
-      <div className="md:hidden flex items-center">
+      {/* Mobile: Hamburger Button */}
+      <div className="md:hidden flex items-center gap-3">
+        {/* User Avatar on Mobile */}
+        {userName && (
+          <div className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
+            <span className="text-darkTeal font-bold text-xs">
+              {userName.substring(0, 2).toUpperCase()}
+            </span>
+          </div>
+        )}
+
+        {/* Hamburger Menu Button */}
         <button
           aria-label={mobileOpen ? "Close menu" : "Open menu"}
-          onClick={() => setMobileOpen((s) => !s)}
-          className="p-2 rounded-md text-white/90 hover:bg-white/5"
+          onClick={() => setMobileOpen(!mobileOpen)}
+          className="p-2 rounded-lg text-light hover:bg-light/10 transition-colors"
         >
-          {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+          {mobileOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
 
-      {/* Mobile panel: absolute overlay so it doesn't push content down */}
+      {/* Mobile Menu Backdrop */}
       {mobileOpen && (
-        <div className="absolute right-0 top-full mt-2 w-56 bg-primary/90 rounded-md p-2 space-y-1 z-50 md:hidden">
+        <div
+          className="fixed inset-0 bg-dark/50 backdrop-blur-sm z-40 md:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      {/* Mobile Menu Panel */}
+      <div
+        className={`
+          fixed right-5 top-16 w-72 bg-primary shadow-2xl rounded-lg 
+          transform transition-all duration-300 ease-in-out z-50 md:hidden
+          ${
+            mobileOpen
+              ? "translate-x-0 opacity-100"
+              : "translate-x-full opacity-0 pointer-events-none"
+          }
+        `}
+      >
+        <div className="p-4 space-y-2">
+          {/* User Info Section */}
+          {userName && (
+            <div className="flex items-center gap-3 px-4 py-3 mb-2 rounded-lg">
+              <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center">
+                <span className="text-darkTeal font-bold text-base">
+                  {userName.substring(0, 2).toUpperCase()}
+                </span>
+              </div>
+              <div>
+                <div className="text-light font-semibold">{userName}</div>
+                <div className="text-light text-xs">View Profile</div>
+              </div>
+            </div>
+          )}
+
+          {/* Navigation Links */}
           <NavLink
             to="/dashboard"
-            className="flex items-center gap-3 px-3 py-2 rounded hover:text-secondary text-light"
+            className={mobileNavLinkClass}
             onClick={() => setMobileOpen(false)}
           >
-            <Home size={18} />
-            <span className="text-sm">My Dashboard</span>
+            <Home size={20} />
+            <span>My Dashboard</span>
           </NavLink>
 
           <NavLink
             to="/create-recipe"
-            className="flex items-center gap-3 px-3 py-2 hover:text-secondary text-light border-t border-light"
+            className={mobileNavLinkClass}
             onClick={() => setMobileOpen(false)}
           >
-            <PlusCircle size={18} />
-            <span className="text-sm">Create Recipe</span>
+            <PlusCircle size={20} />
+            <span>Create Recipe</span>
           </NavLink>
 
           <NavLink
             to="/my-recipes"
-            className="flex items-center gap-3 px-3 py-2 hover:text-secondary text-light border-t border-light"
+            className={mobileNavLinkClass}
             onClick={() => setMobileOpen(false)}
           >
-            <BookOpen size={18} />
-            <span className="text-sm">My Recipes</span>
+            <BookOpen size={20} />
+            <span>My Recipes</span>
           </NavLink>
 
+          {/* Divider */}
+          <div className="border-t border-light/20 my-2"></div>
+
+          {/* Logout Button */}
           <button
             onClick={() => {
               onLogout();
               setMobileOpen(false);
             }}
-            className="flex items-center gap-3 px-3 py-2 hover:text-secondary text-light border-t border-light"
+            className="flex items-center gap-3 px-4 py-3 rounded-lg text-light hover:bg-light/20 hover:text-red-500 transition-colors w-full"
           >
-            <LogOut size={18} />
-            <span className="text-sm">Logout</span>
+            <LogOut size={20} />
+            <span>Logout</span>
           </button>
-
-          {userName && (
-            <div className="flex items-center gap-3 px-3 py-2">
-              <div className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
-                <span className="text-darkTeal font-bold text-sm">
-                  {userName.substring(0, 2).toUpperCase()}
-                </span>
-              </div>
-              <div>
-                <div className="text-sm font-medium">{userName}</div>
-              </div>
-            </div>
-          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }
