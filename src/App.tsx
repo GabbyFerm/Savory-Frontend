@@ -1,20 +1,71 @@
-import { BrowserRouter as Router } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import { Toaster } from "react-hot-toast";
+import { AuthProvider } from "./context/AuthContext";
+import ProtectedRoute from "./components/common/ProtectedRoute";
+
+// Pages
+import LandingPage from "./pages/LandingPage";
+import Dashboard from "./pages/Dashboard";
+import MyRecipes from "./pages/MyRecipes";
+import CreateRecipe from "./pages/CreateRecipe";
+import RecipeDetail from "./pages/RecipeDetail";
 
 function App() {
   return (
     <Router>
-      <Toaster position="top-right" />
+      <AuthProvider>
+        <Toaster position="top-right" />
 
-      {/* We'll add routes here next */}
-      <div className="min-h-screen bg-light">
-        <h1 className="text-center py-20">
-          <span className="font-display text-6xl font-black text-primary">
-            Savory
-          </span>
-          <p className="text-dark mt-4">Frontend setup complete! 🎉</p>
-        </h1>
-      </div>
+        <Routes>
+          {/* Public Route */}
+          <Route path="/" element={<LandingPage />} />
+
+          {/* Protected Routes */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/my-recipes"
+            element={
+              <ProtectedRoute>
+                <MyRecipes />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/create-recipe"
+            element={
+              <ProtectedRoute>
+                <CreateRecipe />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/recipe/:id"
+            element={
+              <ProtectedRoute>
+                <RecipeDetail />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Catch all - redirect to landing */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </AuthProvider>
     </Router>
   );
 }
