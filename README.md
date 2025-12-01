@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
@@ -34,26 +35,26 @@ For production apps, enable type-aware lint rules. Example snippet to include in
 
 ```js
 export default defineConfig([
-  globalIgnores(['dist']),
+  globalIgnores(["dist"]),
   {
-    files: ['**/*.{ts,tsx}'],
+    files: ["**/*.{ts,tsx}"],
     extends: [
       tseslint.configs.recommendedTypeChecked,
       // or tseslint.configs.strictTypeChecked
     ],
     languageOptions: {
       parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        project: ["./tsconfig.node.json", "./tsconfig.app.json"],
         tsconfigRootDir: import.meta.dirname,
       },
     },
   },
-])
+]);
 ```
 
 You can also add React-specific lint plugins such as `eslint-plugin-react-x` and `eslint-plugin-react-dom` if desired.
 
 ---
 
-If you'd like, I can further edit this README to include setup instructions, local development commands, or a short contributor guide. 
-      // Other configs...
+If you'd like, I can further edit this README to include setup instructions, local development commands, or a short contributor guide.
+// Other configs...
