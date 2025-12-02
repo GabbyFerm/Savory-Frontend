@@ -6,7 +6,12 @@ export default function Dashboard() {
   const { user, logout } = useAuth();
 
   return (
-    <Layout isAuthenticated={true} userName={user?.userName} onLogout={logout}>
+    <Layout
+      isAuthenticated={true}
+      userName={user?.userName}
+      avatarColor={user?.avatarColor}
+      onLogout={logout}
+    >
       <PageHeading title={`${user?.userName}'s Dashboard`} />
 
       <div className="container mx-auto px-4 py-8">

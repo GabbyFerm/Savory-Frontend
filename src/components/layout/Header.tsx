@@ -4,12 +4,14 @@ import Navbar from "../common/Navbar";
 interface HeaderProps {
   isAuthenticated: boolean;
   userName?: string;
+  avatarColor?: string;
   onLogout: () => void;
 }
 
 export default function Header({
   isAuthenticated,
   userName,
+  avatarColor,
   onLogout,
 }: HeaderProps) {
   const navigate = useNavigate();
@@ -30,9 +32,11 @@ export default function Header({
 
           {/* Navigation - only show when authenticated */}
           {isAuthenticated && (
-            <div className="self-center md:self-end">
-              <Navbar userName={userName} onLogout={onLogout} />
-            </div>
+            <Navbar
+              userName={userName}
+              avatarColor={avatarColor}
+              onLogout={onLogout}
+            />
           )}
         </div>
       </div>

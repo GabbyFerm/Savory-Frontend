@@ -1,13 +1,19 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { Home, PlusCircle, BookOpen, LogOut, Menu, X } from "lucide-react";
+import Avatar from "./Avatar";
 
 interface NavbarProps {
   userName?: string;
+  avatarColor?: string;
   onLogout: () => void;
 }
 
-export default function Navbar({ userName, onLogout }: NavbarProps) {
+export default function Navbar({
+  userName,
+  avatarColor = "#FBD180",
+  onLogout,
+}: NavbarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const navLinkClass = ({ isActive }: { isActive: boolean }) =>
@@ -50,10 +56,8 @@ export default function Navbar({ userName, onLogout }: NavbarProps) {
         </button>
 
         {userName && (
-          <div className="ml-4 w-10 h-10 rounded-full bg-secondary flex items-center justify-center">
-            <span className="text-darkTeal font-bold text-sm">
-              {userName.substring(0, 2).toUpperCase()}
-            </span>
+          <div className="ml-4">
+            <Avatar userName={userName} avatarColor={avatarColor} size="md" />
           </div>
         )}
       </nav>
@@ -62,11 +66,7 @@ export default function Navbar({ userName, onLogout }: NavbarProps) {
       <div className="md:hidden flex items-center gap-3">
         {/* User Avatar on Mobile */}
         {userName && (
-          <div className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center">
-            <span className="text-darkTeal font-bold text-xs">
-              {userName.substring(0, 2).toUpperCase()}
-            </span>
-          </div>
+          <Avatar userName={userName} avatarColor={avatarColor} size="sm" />
         )}
 
         {/* Hamburger Menu Button */}
@@ -90,14 +90,14 @@ export default function Navbar({ userName, onLogout }: NavbarProps) {
       {/* Mobile Menu Panel */}
       <div
         className={`
-    fixed right-5 top-16 w-72 bg-primary shadow-2xl rounded-lg 
-    transform transition-all duration-300 ease-in-out z-50 md:hidden
-    ${
-      mobileOpen
-        ? "translate-x-0 opacity-100"
-        : "translate-x-full opacity-0 pointer-events-none"
-    }
-  `}
+          fixed right-5 top-16 w-72 bg-primary shadow-2xl rounded-lg 
+          transform transition-all duration-300 ease-in-out z-50 md:hidden
+          ${
+            mobileOpen
+              ? "translate-x-0 opacity-100"
+              : "translate-x-full opacity-0 pointer-events-none"
+          }
+        `}
       >
         <div className="p-4 space-y-2">
           {/* Close Button */}
@@ -114,11 +114,7 @@ export default function Navbar({ userName, onLogout }: NavbarProps) {
           {/* User Info Section */}
           {userName && (
             <div className="flex items-center gap-3 px-4 py-3 mb-2 rounded-lg">
-              <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center">
-                <span className="text-darkTeal font-bold text-base">
-                  {userName.substring(0, 2).toUpperCase()}
-                </span>
-              </div>
+              <Avatar userName={userName} avatarColor={avatarColor} size="lg" />
               <div>
                 <div className="text-light font-semibold">{userName}</div>
                 <div className="text-light text-xs">View Profile</div>
