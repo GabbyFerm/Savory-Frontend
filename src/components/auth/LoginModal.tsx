@@ -1,4 +1,4 @@
-import { Dialog } from "@headlessui/react";
+import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { X } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
@@ -74,7 +74,7 @@ export default function LoginModal({
 
       {/* Modal container */}
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <Dialog.Panel className="relative bg-[#F5F5F5] rounded-lg p-8 max-w-md w-full shadow-2xl">
+        <DialogPanel className="relative bg-[#F5F5F5] rounded-lg p-8 max-w-md w-full shadow-2xl">
           {/* Close button */}
           <button
             onClick={handleClose}
@@ -85,9 +85,9 @@ export default function LoginModal({
           </button>
 
           {/* Title */}
-          <Dialog.Title className="font-display text-3xl font-bold mb-2 text-dark">
+          <DialogTitle className="font-display text-3xl font-bold mb-2 text-dark">
             Welcome Back
-          </Dialog.Title>
+          </DialogTitle>
           <p className="text-dark/70 mb-6 text-sm">
             Login to access your recipes
           </p>
@@ -140,7 +140,7 @@ export default function LoginModal({
               </button>
             </p>
           </div>
-        </Dialog.Panel>
+        </DialogPanel>
       </div>
     </Dialog>
   );

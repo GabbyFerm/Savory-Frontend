@@ -14,6 +14,7 @@ import type {
   LoginRequest,
   RegisterRequest,
 } from "../types";
+import { extractErrorMessage } from "../utils/errorHandler";
 
 interface AuthContextType {
   user: User | null;
@@ -55,18 +56,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const response = await api.post<AuthResponse>("/auth/login", credentials);
       const { token, user: userData } = response.data;
 
-      // Store token and user in localStorage
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(userData));
-
-      // Update state
       setUser(userData);
 
       toast.success(`Welcome back, ${userData.userName}!`);
       navigate("/dashboard");
     } catch (error: any) {
-      const message =
-        error.response?.data?.message || "Login failed. Please try again.";
+      const message = extractErrorMessage(
+        error,
+        "Login failed. Please try again."
+      );
       toast.error(message);
       throw error;
     }
@@ -78,19 +78,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const response = await api.post<AuthResponse>("/auth/register", userData);
       const { token, user: newUser } = response.data;
 
-      // Store token and user in localStorage
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(newUser));
-
-      // Update state
       setUser(newUser);
 
       toast.success(`Welcome to Savory, ${newUser.userName}!`);
       navigate("/dashboard");
     } catch (error: any) {
-      const message =
-        error.response?.data?.message ||
-        "Registration failed. Please try again.";
+      const message = extractErrorMessage(
+        error,
+        "Registration failed. Please try again."
+      );
       toast.error(message);
       throw error;
     }
