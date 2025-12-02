@@ -90,16 +90,27 @@ export default function Navbar({ userName, onLogout }: NavbarProps) {
       {/* Mobile Menu Panel */}
       <div
         className={`
-          fixed right-5 top-16 w-72 bg-primary shadow-2xl rounded-lg 
-          transform transition-all duration-300 ease-in-out z-50 md:hidden
-          ${
-            mobileOpen
-              ? "translate-x-0 opacity-100"
-              : "translate-x-full opacity-0 pointer-events-none"
-          }
-        `}
+    fixed right-5 top-16 w-72 bg-primary shadow-2xl rounded-lg 
+    transform transition-all duration-300 ease-in-out z-50 md:hidden
+    ${
+      mobileOpen
+        ? "translate-x-0 opacity-100"
+        : "translate-x-full opacity-0 pointer-events-none"
+    }
+  `}
       >
         <div className="p-4 space-y-2">
+          {/* Close Button */}
+          <div className="flex justify-end mb-2">
+            <button
+              onClick={() => setMobileOpen(false)}
+              className="p-2 rounded-lg text-light hover:bg-light/10 transition-colors"
+              aria-label="Close menu"
+            >
+              <X size={20} />
+            </button>
+          </div>
+
           {/* User Info Section */}
           {userName && (
             <div className="flex items-center gap-3 px-4 py-3 mb-2 rounded-lg">
