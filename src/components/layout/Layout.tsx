@@ -6,6 +6,7 @@ interface LayoutProps {
   children: ReactNode;
   isAuthenticated: boolean;
   userName?: string;
+  avatarColor?: string;
   onLogout: () => void;
 }
 
@@ -13,6 +14,7 @@ export default function Layout({
   children,
   isAuthenticated,
   userName,
+  avatarColor,
   onLogout,
 }: LayoutProps) {
   return (
@@ -20,6 +22,7 @@ export default function Layout({
       <Header
         isAuthenticated={isAuthenticated}
         userName={userName}
+        avatarColor={avatarColor}
         onLogout={onLogout}
       />
 
