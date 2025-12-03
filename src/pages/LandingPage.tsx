@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ChefHat,
@@ -18,9 +18,15 @@ export default function LandingPage() {
   const [loginOpen, setLoginOpen] = useState(false);
   const [registerOpen, setRegisterOpen] = useState(false);
 
-  // If already logged in, redirect to dashboard
+  // Auto-redirect if authenticated - use useEffect!
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, [isAuthenticated, navigate]);
+
+  // Don't render if authenticated
   if (isAuthenticated) {
-    navigate("/dashboard");
     return null;
   }
 
