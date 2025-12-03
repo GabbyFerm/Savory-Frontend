@@ -5,9 +5,10 @@ import { useAuth } from "../context/AuthContext";
 import Layout from "../components/layout/Layout";
 import PageHeading from "../components/layout/PageHeading";
 import Button from "../components/common/Button";
+import Pagination from "../components/common/Pagination";
 import api from "../api/axios";
 import toast from "react-hot-toast";
-import type { Recipe } from "../types";
+import type { Recipe, PagedResult } from "../types";
 
 type SortOption = "title" | "categoryName" | "createdAt" | "cookTime";
 
@@ -19,13 +20,19 @@ export default function MyRecipes() {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState<SortOption>("createdAt");
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const pageSize = 10;
+
   // Fetch recipes
   useEffect(() => {
     const fetchRecipes = async () => {
+      setIsLoading(true);
       try {
         const params = new URLSearchParams();
 
-        // Unified search - searches both title and ingredient
         if (searchTerm) {
           params.append("searchTerm", searchTerm);
           params.append("ingredientName", searchTerm);
@@ -33,11 +40,16 @@ export default function MyRecipes() {
 
         params.append("sortBy", sortBy);
         params.append("sortOrder", "asc");
+        params.append("pageNumber", currentPage.toString());
+        params.append("pageSize", pageSize.toString());
 
-        const response = await api.get<Recipe[]>(
+        const response = await api.get<PagedResult<Recipe>>(
           `/recipe?${params.toString()}`
         );
-        setRecipes(response.data);
+
+        setRecipes(response.data.items);
+        setTotalPages(response.data.totalPages);
+        setTotalCount(response.data.totalCount);
       } catch (error) {
         console.error("Failed to fetch recipes:", error);
         toast.error("Failed to load recipes");
@@ -47,7 +59,17 @@ export default function MyRecipes() {
     };
 
     fetchRecipes();
+  }, [searchTerm, sortBy, currentPage]);
+
+  // Reset to page 1 when search or sort changes
+  useEffect(() => {
+    setCurrentPage(1);
   }, [searchTerm, sortBy]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   if (!user) return null;
 
@@ -114,7 +136,7 @@ export default function MyRecipes() {
             </button>
           </div>
 
-          {/* Search Bar - Unified */}
+          {/* Search Bar */}
           <div className="relative w-full md:w-64">
             <Search
               className="absolute left-3 top-1/2 -translate-y-1/2 text-darkTeal/80"
@@ -129,6 +151,14 @@ export default function MyRecipes() {
             />
           </div>
         </div>
+
+        {/* Results Count */}
+        {!isLoading && (
+          <p className="text-darkTeal/60 mb-4">
+            {totalCount} recipe{totalCount !== 1 ? "s" : ""} found
+            {totalPages > 1 && ` (Page ${currentPage} of ${totalPages})`}
+          </p>
+        )}
 
         {/* Loading State */}
         {isLoading ? (
@@ -164,76 +194,79 @@ export default function MyRecipes() {
             </Button>
           </div>
         ) : (
-          /* Recipe List - Responsive cards: image on top for mobile, left for md+ */
-          <div className="space-y-4">
-            {recipes.map((recipe) => {
-              const imageUrl = recipe.imagePath
-                ? `${import.meta.env.VITE_API_URL?.replace("/api", "")}${
-                    recipe.imagePath
-                  }`
-                : null;
+          <>
+            {/* Recipe List */}
+            <div className="space-y-4">
+              {recipes.map((recipe) => {
+                const imageUrl = recipe.imagePath
+                  ? `${import.meta.env.VITE_API_URL?.replace("/api", "")}${
+                      recipe.imagePath
+                    }`
+                  : null;
 
-              return (
-                <div
-                  key={recipe.id}
-                  onClick={() => navigate(`/recipe/${recipe.id}`)}
-                  className="flex flex-col md:flex-row items-start bg-darkTeal/20 rounded-lg overflow-hidden hover:bg-primary/30 transition-colors cursor-pointer border border-primary"
+                return (
+                  <div
+                    key={recipe.id}
+                    onClick={() => navigate(`/recipe/${recipe.id}`)}
+                    className="flex flex-col md:flex-row items-start bg-darkTeal/20 rounded-lg overflow-hidden hover:bg-primary/30 transition-colors cursor-pointer border border-primary"
+                  >
+                    {/* Image wrapper */}
+                    <div className="w-full h-36 md:w-80 md:h-full flex-shrink-0 bg-gradient-to-br from-primary/20 to-secondary/20 max-h-[144px] md:max-h-[140px] overflow-hidden">
+                      {imageUrl ? (
+                        <img
+                          src={imageUrl}
+                          alt={recipe.title}
+                          className="w-full h-full object-cover block"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <ChefHat size={40} className="text-primary/40" />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex-grow p-4 min-h-0 overflow-hidden max-h-[144px] md:max-h-[140px]">
+                      <h2 className="font-display text-xl font-bold text-darkTeal mb-2 leading-tight">
+                        {recipe.title}
+                      </h2>
+
+                      <p className="text-sm text-darkTeal font-bold mb-2 leading-snug">
+                        CookTime: {recipe.cookTime || "No cook time available"}{" "}
+                        || PrepTime:{" "}
+                        {recipe.prepTime || "No prep time available"} ||
+                        Servings: {recipe.servings || "No servings available"}
+                      </p>
+
+                      <p className="text-base text-darkTeal line-clamp-2 leading-relaxed">
+                        {recipe.description || "No description available"}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+
+              {/* Add Recipe Button */}
+              <div className="mt-8 text-center">
+                <Button
+                  variant="buttonText"
+                  onClick={() => navigate("/create-recipe")}
+                  className="inline-flex items-center gap-2"
                 >
-                  {/* Image wrapper:
-                      - mobile: taller (h-36) so the image sits higher
-                      - md+: fixed width left column with md:max-h matching content
-                  */}
-                  <div className="w-full h-36 md:w-80 md:h-full flex-shrink-0 bg-gradient-to-br from-primary/20 to-secondary/20 max-h-[144px] md:max-h-[140px] overflow-hidden">
-                    {imageUrl ? (
-                      <img
-                        src={imageUrl}
-                        alt={recipe.title}
-                        className="w-full h-full object-cover block"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <ChefHat size={40} className="text-primary/40" />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Content:
-                      - min-h-0 so overflow works inside flex children
-                      - max-h matches the image wrapper so the visible area lines up
-                      - line-clamp remains active on mobile and desktop so description is truncated
-                  */}
-                  <div className="flex-grow p-4 min-h-0 overflow-hidden max-h-[144px] md:max-h-[140px]">
-                    <h2 className="font-display text-xl font-bold text-darkTeal mb-2 leading-tight">
-                      {recipe.title}
-                    </h2>
-
-                    <p className="text-sm text-darkTeal font-bold mb-2 leading-snug">
-                      CookTime: {recipe.cookTime || "No cook time available"} ||
-                      PrepTime: {recipe.prepTime || "No prep time available"} ||
-                      Servings: {recipe.servings || "No servings available"}
-                    </p>
-
-                    {/* keep description clamped on mobile + desktop */}
-                    <p className="text-base text-darkTeal line-clamp-2 leading-relaxed">
-                      {recipe.description || "No description available"}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-
-            {/* Add Recipe Button - After List */}
-            <div className="mt-8 text-center">
-              <Button
-                variant="buttonText"
-                onClick={() => navigate("/create-recipe")}
-                className="inline-flex items-center gap-2"
-              >
-                [ <PlusCircle size={16} />
-                Add New Recipe ]
-              </Button>
+                  [ <PlusCircle size={16} />
+                  Add New Recipe ]
+                </Button>
+              </div>
             </div>
-          </div>
+
+            {/* Pagination - Outside recipe list */}
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              isLoading={isLoading}
+            />
+          </>
         )}
       </div>
     </Layout>
