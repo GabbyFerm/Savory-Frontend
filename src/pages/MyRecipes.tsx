@@ -164,7 +164,7 @@ export default function MyRecipes() {
             </Button>
           </div>
         ) : (
-          /* Recipe List - Horizontal Cards */
+          /* Recipe List - Responsive cards: image on top for mobile, left for md+ */
           <div className="space-y-4">
             {recipes.map((recipe) => {
               const imageUrl = recipe.imagePath
@@ -177,15 +177,18 @@ export default function MyRecipes() {
                 <div
                   key={recipe.id}
                   onClick={() => navigate(`/recipe/${recipe.id}`)}
-                  className="flex bg-darkTeal/20 rounded-lg overflow-hidden hover:bg-primary/30 transition-colors cursor-pointer border border-primary"
+                  className="flex flex-col md:flex-row items-start bg-darkTeal/20 rounded-lg overflow-hidden hover:bg-primary/30 transition-colors cursor-pointer border border-primary"
                 >
-                  {/* Image */}
-                  <div className="md:w-80 h-32 flex-shrink-0 bg-gradient-to-br from-primary/20 to-secondary/20">
+                  {/* Image wrapper:
+                      - mobile: taller (h-36) so the image sits higher
+                      - md+: fixed width left column with md:max-h matching content
+                  */}
+                  <div className="w-full h-36 md:w-80 md:h-full flex-shrink-0 bg-gradient-to-br from-primary/20 to-secondary/20 max-h-[144px] md:max-h-[140px] overflow-hidden">
                     {imageUrl ? (
                       <img
                         src={imageUrl}
                         alt={recipe.title}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover block"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
@@ -194,17 +197,24 @@ export default function MyRecipes() {
                     )}
                   </div>
 
-                  {/* Content */}
-                  <div className="flex-grow p-4">
-                    <h2 className="font-display text-xl font-bold text-darkTeal mb-2">
+                  {/* Content:
+                      - min-h-0 so overflow works inside flex children
+                      - max-h matches the image wrapper so the visible area lines up
+                      - line-clamp remains active on mobile and desktop so description is truncated
+                  */}
+                  <div className="flex-grow p-4 min-h-0 overflow-hidden max-h-[144px] md:max-h-[140px]">
+                    <h2 className="font-display text-xl font-bold text-darkTeal mb-2 leading-tight">
                       {recipe.title}
                     </h2>
-                    <p className="text-sm text-darkTeal font-bold line-clamp-2">
+
+                    <p className="text-sm text-darkTeal font-bold mb-2 leading-snug">
                       CookTime: {recipe.cookTime || "No cook time available"} ||
                       PrepTime: {recipe.prepTime || "No prep time available"} ||
                       Servings: {recipe.servings || "No servings available"}
                     </p>
-                    <p className="text-base text-darkTeal line-clamp-2">
+
+                    {/* keep description clamped on mobile + desktop */}
+                    <p className="text-base text-darkTeal line-clamp-2 leading-relaxed">
                       {recipe.description || "No description available"}
                     </p>
                   </div>
