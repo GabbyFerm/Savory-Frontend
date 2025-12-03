@@ -14,7 +14,7 @@ import Dashboard from "./pages/Dashboard";
 import MyRecipes from "./pages/MyRecipes";
 import CreateRecipe from "./pages/CreateRecipe";
 import RecipeDetail from "./pages/RecipeDetail";
-import TestPage from "./pages/TestPage";
+import EditRecipe from "./pages/EditRecipe";
 
 function App() {
   return (
@@ -63,7 +63,14 @@ function App() {
             }
           />
 
-          <Route path="/test" element={<TestPage />} />
+          <Route
+            path="/recipe/:id/edit"
+            element={
+              <ProtectedRoute>
+                <EditRecipe />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Catch all - redirect to landing */}
           <Route path="*" element={<Navigate to="/" replace />} />
