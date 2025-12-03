@@ -25,6 +25,46 @@ export default function RecipeDetail() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  // Helper to format ingredient quantity/unit
+  const formatQuantity = (ingredient: any) => {
+    // defensive fallbacks
+    const rawUnit = (ingredient.unit ?? "").toString().trim();
+    const rawQty = ingredient.quantity;
+    const unit = rawUnit.toLowerCase();
+
+    // "to taste" priority
+    if (unit.includes("to taste")) {
+      return "To taste";
+    }
+
+    // "pinch" -> "A pinch" or "N pinches"
+    if (unit.includes("pinch")) {
+      const qtyNum = Number(rawQty);
+      if (!Number.isNaN(qtyNum) && qtyNum > 1) {
+        return `${qtyNum} pinches`;
+      }
+      // either 0, missing or 1 -> use "A pinch"
+      return "A pinch";
+    }
+
+    // If no meaningful quantity (0 / null / undefined / empty string), show just the unit if present
+    if (
+      rawQty === null ||
+      rawQty === undefined ||
+      rawQty === "" ||
+      rawQty === 0 ||
+      rawQty === "0"
+    ) {
+      return rawUnit ? capitalizeUnit(rawUnit) : "";
+    }
+
+    // Default numeric + unit rendering (preserve provided unit)
+    return `${rawQty}${rawUnit ? " " + rawUnit : ""}`;
+  };
+
+  const capitalizeUnit = (s: string) =>
+    s.length === 0 ? s : s[0].toUpperCase() + s.slice(1);
+
   // Fetch recipe
   useEffect(() => {
     const fetchRecipe = async () => {
@@ -269,26 +309,31 @@ export default function RecipeDetail() {
                 </h2>
                 {recipe.ingredients && recipe.ingredients.length > 0 ? (
                   <ul className="space-y-3">
-                    {recipe.ingredients.map((ingredient) => (
-                      <li
-                        key={ingredient.ingredientId}
-                        className="flex items-center gap-2 text-light"
-                      >
-                        <label className="flex items-center gap-3 cursor-pointer group">
-                          <input
-                            type="checkbox"
-                            className="appearance-none h-5 w-5 border-2 border-light rounded checked:bg-secondary checked:border-secondary transition-colors cursor-pointer"
-                            aria-label={`Toggle ${ingredient.ingredientName}`}
-                          />
-                          <span className="group-has-[:checked]:line-through group-has-[:checked]:opacity-60 transition-all">
-                            <span className="font-semibold">
-                              {ingredient.quantity} {ingredient.unit}
-                            </span>{" "}
-                            {ingredient.ingredientName}
-                          </span>
-                        </label>
-                      </li>
-                    ))}
+                    {recipe.ingredients.map((ingredient) => {
+                      const qtyText = formatQuantity(ingredient);
+                      return (
+                        <li
+                          key={ingredient.ingredientId}
+                          className="flex items-center gap-2 text-light"
+                        >
+                          <label className="flex items-center gap-3 cursor-pointer group">
+                            <input
+                              type="checkbox"
+                              className="appearance-none h-5 w-5 border-2 border-light rounded checked:bg-secondary checked:border-secondary transition-colors cursor-pointer"
+                              aria-label={`Toggle ${ingredient.ingredientName}`}
+                            />
+                            <span className="group-has-[:checked]:line-through group-has-[:checked]:opacity-60 transition-all">
+                              {qtyText ? (
+                                <span className="font-semibold">
+                                  {qtyText}{" "}
+                                </span>
+                              ) : null}
+                              {ingredient.ingredientName}
+                            </span>
+                          </label>
+                        </li>
+                      );
+                    })}
                   </ul>
                 ) : (
                   <p className="text-light/60 italic">No ingredients listed</p>
