@@ -10,6 +10,7 @@ import ImageUpload from "../components/common/ImageUpload";
 import api from "../api/axios";
 import toast from "react-hot-toast";
 import type { Category, Ingredient, Recipe } from "../types";
+import { extractErrorMessage } from "../utils/errorHandler";
 
 interface RecipeIngredientForm {
   ingredientId: string;
@@ -30,9 +31,7 @@ export default function EditRecipe() {
   const [cookTime, setCookTime] = useState<number>(0);
   const [servings, setServings] = useState<number>(1);
   const [categoryId, setCategoryId] = useState("");
-  const [recipeIngredients, setRecipeIngredients] = useState<
-    RecipeIngredientForm[]
-  >([]);
+  const [recipeIngredients, setRecipeIngredients] = useState<RecipeIngredientForm[]>([]);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [currentImagePath, setCurrentImagePath] = useState<string | null>(null);
 
@@ -115,9 +114,7 @@ export default function EditRecipe() {
     value: string | number
   ) => {
     setRecipeIngredients(
-      recipeIngredients.map((i) =>
-        i.tempId === tempId ? { ...i, [field]: value } : i
-      )
+      recipeIngredients.map((i) => (i.tempId === tempId ? { ...i, [field]: value } : i))
     );
   };
 
@@ -142,10 +139,9 @@ export default function EditRecipe() {
       setNewIngredientName("");
       setNewIngredientUnit("");
       toast.success(`Ingredient "${createdIngredient.name}" created!`);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Failed to create ingredient:", error);
-      const message =
-        error.response?.data?.message || "Failed to create ingredient";
+      const message = extractErrorMessage(error, "Failed to create ingredient");
       toast.error(message);
     } finally {
       setIsCreatingIngredient(false);
@@ -160,9 +156,7 @@ export default function EditRecipe() {
         return false;
       }
 
-      const ingredient = ingredients.find(
-        (ing) => ing.id === recipeIng.ingredientId
-      );
+      const ingredient = ingredients.find((ing) => ing.id === recipeIng.ingredientId);
 
       if (
         ingredient &&
@@ -236,10 +230,9 @@ export default function EditRecipe() {
 
       toast.success("Recipe updated successfully!");
       navigate(`/recipe/${id}`);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Failed to update recipe:", error);
-      const message =
-        error.response?.data?.message || "Failed to update recipe";
+      const message = extractErrorMessage(error, "Failed to update recipe");
       toast.error(message);
     } finally {
       setIsSubmitting(false);
@@ -281,9 +274,7 @@ export default function EditRecipe() {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Image Upload */}
           <div>
-            <label className="block text-darkTeal font-semibold mb-2">
-              Recipe Image
-            </label>
+            <label className="block text-darkTeal font-semibold mb-2">Recipe Image</label>
             <ImageUpload
               currentImage={currentImageUrl}
               onImageSelect={setSelectedImage}
@@ -360,9 +351,7 @@ export default function EditRecipe() {
 
           {/* Description */}
           <div>
-            <label className="block text-darkTeal font-semibold mb-2">
-              Description
-            </label>
+            <label className="block text-darkTeal font-semibold mb-2">Description</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -436,21 +425,14 @@ export default function EditRecipe() {
                     selectedIngredient?.unit.toLowerCase() === "pinch";
 
                   return (
-                    <div
-                      key={ingredient.tempId}
-                      className="flex gap-3 items-end pb-2"
-                    >
+                    <div key={ingredient.tempId} className="flex gap-3 items-end pb-2">
                       {" "}
                       {/* ← Added pb-2 */}
                       <div className="flex-grow">
                         <select
                           value={ingredient.ingredientId}
                           onChange={(e) =>
-                            updateIngredient(
-                              ingredient.tempId,
-                              "ingredientId",
-                              e.target.value
-                            )
+                            updateIngredient(ingredient.tempId, "ingredientId", e.target.value)
                           }
                           required
                           disabled={isSubmitting}
@@ -469,11 +451,7 @@ export default function EditRecipe() {
                           type="number"
                           value={ingredient.quantity}
                           onChange={(e) =>
-                            updateIngredient(
-                              ingredient.tempId,
-                              "quantity",
-                              Number(e.target.value)
-                            )
+                            updateIngredient(ingredient.tempId, "quantity", Number(e.target.value))
                           }
                           min="0"
                           step="0.1"

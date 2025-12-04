@@ -18,11 +18,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
     return (
       <div className="w-full">
-        {label && (
-          <label className="block text-sm font-medium text-dark mb-1">
-            {label}
-          </label>
-        )}
+        {label && <label className="block text-sm font-medium text-dark mb-1">{label}</label>}
         <div className="relative">
           <input
             ref={ref}

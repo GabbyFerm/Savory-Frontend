@@ -8,12 +8,7 @@ interface HeaderProps {
   onLogout: () => void;
 }
 
-export default function Header({
-  isAuthenticated,
-  userName,
-  avatarColor,
-  onLogout,
-}: HeaderProps) {
+export default function Header({ isAuthenticated, userName, avatarColor, onLogout }: HeaderProps) {
   const navigate = useNavigate();
 
   return (
@@ -32,11 +27,7 @@ export default function Header({
 
           {/* Navigation - only show when authenticated */}
           {isAuthenticated && (
-            <Navbar
-              userName={userName}
-              avatarColor={avatarColor}
-              onLogout={onLogout}
-            />
+            <Navbar userName={userName} avatarColor={avatarColor} onLogout={onLogout} />
           )}
         </div>
       </div>

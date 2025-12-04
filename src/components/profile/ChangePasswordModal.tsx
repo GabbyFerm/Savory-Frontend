@@ -10,11 +10,7 @@ interface ChangePasswordModalProps {
   onSave: (currentPassword: string, newPassword: string) => Promise<void>;
 }
 
-export default function ChangePasswordModal({
-  isOpen,
-  onClose,
-  onSave,
-}: ChangePasswordModalProps) {
+export default function ChangePasswordModal({ isOpen, onClose, onSave }: ChangePasswordModalProps) {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -90,10 +86,7 @@ export default function ChangePasswordModal({
   return (
     <Dialog open={isOpen} onClose={handleClose} className="relative z-50">
       {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-dark/60 backdrop-blur-sm"
-        aria-hidden="true"
-      />
+      <div className="fixed inset-0 bg-dark/60 backdrop-blur-sm" aria-hidden="true" />
 
       {/* Modal container */}
       <div className="fixed inset-0 flex items-center justify-center p-4">
@@ -154,12 +147,7 @@ export default function ChangePasswordModal({
               >
                 Cancel
               </Button>
-              <Button
-                type="submit"
-                variant="primary"
-                disabled={isLoading}
-                fullWidth
-              >
+              <Button type="submit" variant="primary" disabled={isLoading} fullWidth>
                 {isLoading ? "Changing..." : "Change Password"}
               </Button>
             </div>

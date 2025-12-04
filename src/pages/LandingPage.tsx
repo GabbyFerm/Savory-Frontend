@@ -1,13 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  ChefHat,
-  UserPlus,
-  LogIn,
-  BookOpen,
-  Search,
-  BarChart3,
-} from "lucide-react";
+import { ChefHat, UserPlus, LogIn, BookOpen, Search, BarChart3 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import LoginModal from "../components/auth/LoginModal";
 import RegisterModal from "../components/auth/RegisterModal";
@@ -43,23 +36,16 @@ export default function LandingPage() {
           </div>
 
           {/* Title */}
-          <h1 className="font-display text-9xl font-black mb-3 italic text-[#F5F5F5]">
-            Savory
-          </h1>
+          <h1 className="font-display text-9xl font-black mb-3 italic text-[#F5F5F5]">Savory</h1>
           <p className="text-xl mb-12 font-light text-[#F5F5F5]">
-            Your personal <span className="italic font-semibold">Recipe</span>{" "}
-            Manager
+            Your personal <span className="italic font-semibold">Recipe</span> Manager
           </p>
 
           {/* Main Content - Image + Text Side by Side */}
           <div className="grid md:grid-cols-6 gap-8 items-center mb-12 max-w-5xl mx-auto">
             {/* Left - Recipe Icon Image (takes 2 columns) */}
             <div className="md:col-span-2 flex justify-center md:justify-end">
-              <img
-                src="/recipe-icon.png"
-                alt="Recipe illustration"
-                className="w-70 h-auto"
-              />
+              <img src="/recipe-icon.png" alt="Recipe illustration" className="w-70 h-auto" />
             </div>
 
             {/* Right - Description Text (takes 3 columns) */}
@@ -68,17 +54,15 @@ export default function LandingPage() {
                 Your Digital Cookbook
               </h2>
               <p className="text-[#F5F5F5] text-lg leading-relaxed mb-4">
-                Store and organize all your favorite recipes in one beautiful
-                place.
+                Store and organize all your favorite recipes in one beautiful place.
               </p>
               <p className="text-[#F5F5F5] leading-relaxed mb-4">
-                Whether it's grandma's secret pasta recipe or that amazing dish
-                you discovered last week, Savory keeps everything organized and
-                easy to find.
+                Whether it's grandma's secret pasta recipe or that amazing dish you discovered last
+                week, Savory keeps everything organized and easy to find.
               </p>
               <p className="text-[#F5F5F5] leading-relaxed">
-                Search by ingredients, filter by category, and track your
-                cooking journey with personal statistics.
+                Search by ingredients, filter by category, and track your cooking journey with
+                personal statistics.
               </p>
             </div>
           </div>
@@ -111,9 +95,7 @@ export default function LandingPage() {
                 <BookOpen size={40} className="text-secondary" />
               </div>
             </div>
-            <h3 className="font-display text-xl font-bold mb-2">
-              Organize Recipes
-            </h3>
+            <h3 className="font-display text-xl font-bold mb-2">Organize Recipes</h3>
             <p className="text-white/80 text-sm">
               Keep all your recipes in one organized digital cookbook
             </p>
@@ -126,9 +108,7 @@ export default function LandingPage() {
                 <Search size={40} className="text-secondary" />
               </div>
             </div>
-            <h3 className="font-display text-xl font-bold mb-2">
-              Quick Search
-            </h3>
+            <h3 className="font-display text-xl font-bold mb-2">Quick Search</h3>
             <p className="text-white/80 text-sm">
               Find recipes instantly by ingredient, category, or name
             </p>
@@ -141,9 +121,7 @@ export default function LandingPage() {
                 <BarChart3 size={40} className="text-secondary" />
               </div>
             </div>
-            <h3 className="font-display text-xl font-bold mb-2">
-              Track Progress
-            </h3>
+            <h3 className="font-display text-xl font-bold mb-2">Track Progress</h3>
             <p className="text-white/80 text-sm">
               View insights and statistics about your cooking journey
             </p>

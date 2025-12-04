@@ -1,21 +1,21 @@
-import axios from 'axios';
-import toast from 'react-hot-toast';
-import type { AuthResponse } from '../types';
+import axios from "axios";
+import toast from "react-hot-toast";
+import type { AuthResponse } from "../types";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
 let isRefreshing = false;
 let failedQueue: Array<{
   resolve: (value: string | null) => void;
-  reject: (error: any) => void;
+  reject: (error: unknown) => void;
 }> = [];
 
-const processQueue = (error: any, token: string | null = null) => {
+const processQueue = (error: unknown, token: string | null = null) => {
   failedQueue.forEach((prom) => {
     if (error) {
       prom.reject(error);
@@ -30,7 +30,7 @@ const processQueue = (error: any, token: string | null = null) => {
 // Request interceptor - Add token to all requests
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -62,14 +62,14 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       isRefreshing = true;
 
-      const refreshToken = localStorage.getItem('refreshToken');
-      const accessToken = localStorage.getItem('token');
+      const refreshToken = localStorage.getItem("refreshToken");
+      const accessToken = localStorage.getItem("token");
 
       if (!refreshToken || !accessToken) {
         // No refresh token, logout
         isRefreshing = false;
         localStorage.clear();
-        window.location.href = '/';
+        window.location.href = "/";
         return Promise.reject(error);
       }
 
@@ -86,8 +86,8 @@ api.interceptors.response.use(
         const { accessToken: newAccessToken, refreshToken: newRefreshToken } = response.data;
 
         // Store new tokens
-        localStorage.setItem('token', newAccessToken);
-        localStorage.setItem('refreshToken', newRefreshToken);
+        localStorage.setItem("token", newAccessToken);
+        localStorage.setItem("refreshToken", newRefreshToken);
 
         // Update authorization header
         api.defaults.headers.common.Authorization = `Bearer ${newAccessToken}`;
@@ -106,10 +106,10 @@ api.interceptors.response.use(
         isRefreshing = false;
 
         localStorage.clear();
-        toast.error('Your session has expired. Please login again.');
+        toast.error("Your session has expired. Please login again.");
 
         setTimeout(() => {
-          window.location.href = '/';
+          window.location.href = "/";
         }, 1000);
 
         return Promise.reject(refreshError);
@@ -118,13 +118,13 @@ api.interceptors.response.use(
 
     // Handle other error codes
     if (error.response?.status === 403) {
-      toast.error('You do not have permission to perform this action.');
+      toast.error("You do not have permission to perform this action.");
     }
     if (error.response?.status === 404) {
-      toast.error('The requested resource was not found.');
+      toast.error("The requested resource was not found.");
     }
     if (error.response?.status === 500) {
-      toast.error('Server error. Please try again later.');
+      toast.error("Server error. Please try again later.");
     }
 
     return Promise.reject(error);
