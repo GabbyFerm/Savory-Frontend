@@ -46,9 +46,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.removeItem("user");
       }
     }
-
     setIsLoading(false);
   }, []);
+
+  // Listen for storage changes (logout in another tab)
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "token" && !e.newValue) {
+        // Token was removed in another tab
+        setUser(null);
+        navigate("/");
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, [navigate]);
 
   // Login function
   const login = async (credentials: LoginRequest) => {
