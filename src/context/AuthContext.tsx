@@ -43,33 +43,60 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } catch (error) {
         console.error("Failed to parse stored user:", error);
         localStorage.removeItem("token");
+        localStorage.removeItem("refreshToken");
         localStorage.removeItem("user");
       }
     }
     setIsLoading(false);
   }, []);
 
-  // Listen for storage changes (logout in another tab)
+  // Listen for storage changes AND periodic token check
   useEffect(() => {
+    // Check if token is still valid periodically
+    const checkAuth = () => {
+      const token = localStorage.getItem("token");
+      const storedUser = localStorage.getItem("user");
+
+      if (!token || !storedUser) {
+        // Token removed - logout
+        if (user) {
+          setUser(null);
+          toast.success("You have been logged out");
+          navigate("/");
+        }
+      }
+    };
+
+    // Listen for storage changes (logout in another tab)
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === "token" && !e.newValue) {
         // Token was removed in another tab
         setUser(null);
+        toast.success("You have been logged out in another tab");
         navigate("/");
       }
     };
 
+    // Check auth every 5 seconds
+    const interval = setInterval(checkAuth, 5000);
+
     window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, [navigate]);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, [user, navigate]);
 
   // Login function
   const login = async (credentials: LoginRequest) => {
     try {
       const response = await api.post<AuthResponse>("/auth/login", credentials);
-      const { token, user: userData } = response.data;
+      const { accessToken, refreshToken, user: userData } = response.data;
 
-      localStorage.setItem("token", token);
+      // Store tokens and user
+      localStorage.setItem("token", accessToken);
+      localStorage.setItem("refreshToken", refreshToken);
       localStorage.setItem("user", JSON.stringify(userData));
       setUser(userData);
 
@@ -89,9 +116,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const register = async (userData: RegisterRequest) => {
     try {
       const response = await api.post<AuthResponse>("/auth/register", userData);
-      const { token, user: newUser } = response.data;
+      const { accessToken, refreshToken, user: newUser } = response.data;
 
-      localStorage.setItem("token", token);
+      // Store tokens and user
+      localStorage.setItem("token", accessToken);
+      localStorage.setItem("refreshToken", refreshToken);
       localStorage.setItem("user", JSON.stringify(newUser));
       setUser(newUser);
 
@@ -111,6 +140,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     // Clear storage
     localStorage.removeItem("token");
+    localStorage.removeItem("refreshToken");
     localStorage.removeItem("user");
 
     // Clear state
@@ -120,19 +150,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     navigate("/");
   };
 
-  const value = {
-    user,
-    isAuthenticated: !!user,
-    isLoading,
-    login,
-    register,
-    logout,
-  };
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthenticated: !!user,
+        isLoading,
+        login,
+        register,
+        logout,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
-// Custom hook to use auth context
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {

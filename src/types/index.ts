@@ -7,7 +7,8 @@ export interface User {
 }
 
 export interface AuthResponse {
-  token: string;
+  accessToken: string;  
+  refreshToken: string; 
   user: User;
 }
 
@@ -21,6 +22,11 @@ export interface RegisterRequest {
   email: string;
   password: string;
   avatarColor?: string;
+}
+
+export interface RefreshTokenRequest {
+  accessToken: string;
+  refreshToken: string;
 }
 
 // Recipe types

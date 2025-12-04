@@ -28,6 +28,12 @@ export default function MyRecipes() {
 
   // Fetch recipes
   useEffect(() => {
+    // Don't fetch if user isn't loaded yet
+    if (!user) {
+      console.log("⏳ Waiting for user...");
+      return;
+    }
+
     const fetchRecipes = async () => {
       setIsLoading(true);
       try {
@@ -38,7 +44,15 @@ export default function MyRecipes() {
           params.append("ingredientName", searchTerm);
         }
 
-        params.append("sortBy", sortBy);
+        // Map camelCase sort values to lowercase backend values
+        const sortByMap: Record<SortOption, string> = {
+          title: "title",
+          categoryName: "categoryname",
+          createdAt: "createddate",
+          cookTime: "cooktime",
+        };
+
+        params.append("sortBy", sortByMap[sortBy]);
         params.append("sortOrder", "asc");
         params.append("pageNumber", currentPage.toString());
         params.append("pageSize", pageSize.toString());
@@ -50,8 +64,9 @@ export default function MyRecipes() {
         setRecipes(response.data.items);
         setTotalPages(response.data.totalPages);
         setTotalCount(response.data.totalCount);
-      } catch (error) {
-        console.error("Failed to fetch recipes:", error);
+      } catch (error: any) {
+        console.error("❌ Failed to fetch recipes:", error);
+        console.error("❌ Error details:", error.response?.data);
         toast.error("Failed to load recipes");
       } finally {
         setIsLoading(false);
@@ -59,7 +74,21 @@ export default function MyRecipes() {
     };
 
     fetchRecipes();
-  }, [searchTerm, sortBy, currentPage]);
+  }, [searchTerm, sortBy, currentPage, user]);
+
+  // Add: Refetch when tab becomes visible
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        // Tab became visible - refetch recipes
+        setCurrentPage(1); // This will trigger the fetch useEffect
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () =>
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, []);
 
   // Reset to page 1 when search or sort changes
   useEffect(() => {
