@@ -79,11 +79,7 @@ export default function ImageUpload({
       {preview ? (
         /* Image Preview */
         <div className="relative w-full h-64 rounded-lg overflow-hidden border-2 border-primary/40">
-          <img
-            src={preview}
-            alt="Recipe preview"
-            className="w-full h-full object-cover"
-          />
+          <img src={preview} alt="Recipe preview" className="w-full h-full object-cover" />
           {!disabled && (
             <button
               type="button"
@@ -107,12 +103,8 @@ export default function ImageUpload({
           <div className="bg-primary/20 p-4 rounded-full mb-4">
             <Upload size={40} className="text-primary" />
           </div>
-          <p className="text-darkTeal font-semibold mb-1">
-            Click to upload image
-          </p>
-          <p className="text-darkTeal/60 text-sm">
-            JPG, PNG or WebP (max {maxSizeMB}MB)
-          </p>
+          <p className="text-darkTeal font-semibold mb-1">Click to upload image</p>
+          <p className="text-darkTeal/60 text-sm">JPG, PNG or WebP (max {maxSizeMB}MB)</p>
         </div>
       )}
 

@@ -10,6 +10,7 @@ import ImageUpload from "../components/common/ImageUpload";
 import api from "../api/axios";
 import toast from "react-hot-toast";
 import type { Category, Ingredient } from "../types";
+import { extractErrorMessage } from "../utils/errorHandler";
 
 interface RecipeIngredientForm {
   ingredientId: string;
@@ -29,9 +30,7 @@ export default function CreateRecipe() {
   const [cookTime, setCookTime] = useState<number>(0);
   const [servings, setServings] = useState<number>(1);
   const [categoryId, setCategoryId] = useState("");
-  const [recipeIngredients, setRecipeIngredients] = useState<
-    RecipeIngredientForm[]
-  >([]);
+  const [recipeIngredients, setRecipeIngredients] = useState<RecipeIngredientForm[]>([]);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
 
   // Dropdown data
@@ -87,9 +86,7 @@ export default function CreateRecipe() {
     value: string | number
   ) => {
     setRecipeIngredients(
-      recipeIngredients.map((i) =>
-        i.tempId === tempId ? { ...i, [field]: value } : i
-      )
+      recipeIngredients.map((i) => (i.tempId === tempId ? { ...i, [field]: value } : i))
     );
   };
 
@@ -119,10 +116,9 @@ export default function CreateRecipe() {
       setNewIngredientUnit("");
 
       toast.success(`Ingredient "${createdIngredient.name}" created!`);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Failed to create ingredient:", error);
-      const message =
-        error.response?.data?.message || "Failed to create ingredient";
+      const message = extractErrorMessage(error, "Failed to create ingredient");
       toast.error(message);
     } finally {
       setIsCreatingIngredient(false);
@@ -138,9 +134,7 @@ export default function CreateRecipe() {
       }
 
       // Find the ingredient in the list
-      const ingredient = ingredients.find(
-        (ing) => ing.id === recipeIng.ingredientId
-      );
+      const ingredient = ingredients.find((ing) => ing.id === recipeIng.ingredientId);
 
       // If unit is not "to taste" or "pinch", require quantity > 0
       if (
@@ -216,10 +210,9 @@ export default function CreateRecipe() {
 
       toast.success("Recipe created successfully!");
       navigate(`/recipe/${createdRecipe.id}`);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Failed to create recipe:", error);
-      const message =
-        error.response?.data?.message || "Failed to create recipe";
+      const message = extractErrorMessage(error, "Failed to create recipe");
       toast.error(message);
     } finally {
       setIsSubmitting(false);
@@ -257,9 +250,7 @@ export default function CreateRecipe() {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Image Upload */}
           <div>
-            <label className="block text-darkTeal font-semibold mb-2">
-              Recipe Image
-            </label>
+            <label className="block text-darkTeal font-semibold mb-2">Recipe Image</label>
             <ImageUpload
               onImageSelect={setSelectedImage}
               onImageRemove={() => setSelectedImage(null)}
@@ -332,9 +323,7 @@ export default function CreateRecipe() {
 
           {/* Description */}
           <div>
-            <label className="block text-darkTeal font-semibold mb-2">
-              Description
-            </label>
+            <label className="block text-darkTeal font-semibold mb-2">Description</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -407,19 +396,12 @@ export default function CreateRecipe() {
                     selectedIngredient?.unit.toLowerCase() === "pinch";
 
                   return (
-                    <div
-                      key={ingredient.tempId}
-                      className="flex gap-3 items-end"
-                    >
+                    <div key={ingredient.tempId} className="flex gap-3 items-end">
                       <div className="flex-grow">
                         <select
                           value={ingredient.ingredientId}
                           onChange={(e) =>
-                            updateIngredient(
-                              ingredient.tempId,
-                              "ingredientId",
-                              e.target.value
-                            )
+                            updateIngredient(ingredient.tempId, "ingredientId", e.target.value)
                           }
                           required
                           disabled={isSubmitting}
@@ -438,11 +420,7 @@ export default function CreateRecipe() {
                           type="number"
                           value={ingredient.quantity}
                           onChange={(e) =>
-                            updateIngredient(
-                              ingredient.tempId,
-                              "quantity",
-                              Number(e.target.value)
-                            )
+                            updateIngredient(ingredient.tempId, "quantity", Number(e.target.value))
                           }
                           min="0"
                           step="0.1"

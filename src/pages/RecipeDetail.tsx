@@ -1,20 +1,20 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import {
-  Clock,
-  ChefHat,
-  Utensils,
-  Users,
-  Edit,
-  Trash2,
-  ArrowLeft,
-} from "lucide-react";
+import { Clock, ChefHat, Utensils, Users, Edit, Trash2, ArrowLeft } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import Layout from "../components/layout/Layout";
 import Button from "../components/common/Button";
 import api from "../api/axios";
 import toast from "react-hot-toast";
 import type { Recipe } from "../types";
+import { extractErrorMessage } from "../utils/errorHandler";
+
+type IngredientLike = {
+  ingredientId: string;
+  ingredientName: string;
+  unit?: string | null;
+  quantity?: number | string | null;
+};
 
 export default function RecipeDetail() {
   const { id } = useParams<{ id: string }>();
@@ -26,8 +26,7 @@ export default function RecipeDetail() {
   const [isDeleting, setIsDeleting] = useState(false);
 
   // Helper to format ingredient quantity/unit
-  const formatQuantity = (ingredient: any) => {
-    // defensive fallbacks
+  const formatQuantity = (ingredient: IngredientLike) => {
     const rawUnit = (ingredient.unit ?? "").toString().trim();
     const rawQty = ingredient.quantity;
     const unit = rawUnit.toLowerCase();
@@ -62,8 +61,7 @@ export default function RecipeDetail() {
     return `${rawQty}${rawUnit ? " " + rawUnit : ""}`;
   };
 
-  const capitalizeUnit = (s: string) =>
-    s.length === 0 ? s : s[0].toUpperCase() + s.slice(1);
+  const capitalizeUnit = (s: string) => (s.length === 0 ? s : s[0].toUpperCase() + s.slice(1));
 
   // Fetch recipe
   useEffect(() => {
@@ -79,10 +77,9 @@ export default function RecipeDetail() {
         }
 
         setRecipe(recipeData);
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error("❌ Failed to fetch recipe:", error);
-        const message =
-          error.response?.data?.message || "Failed to load recipe";
+        const message = extractErrorMessage(error, "Failed to load recipe");
         toast.error(message);
         navigate("/my-recipes");
       } finally {
@@ -104,10 +101,9 @@ export default function RecipeDetail() {
       await api.delete(`/recipe/${recipe.id}`);
       toast.success("Recipe deleted successfully!");
       navigate("/my-recipes");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Failed to delete recipe:", error);
-      const message =
-        error.response?.data?.message || "Failed to delete recipe";
+      const message = extractErrorMessage(error, "Failed to delete recipe");
       toast.error(message);
     } finally {
       setIsDeleting(false);
@@ -143,17 +139,17 @@ export default function RecipeDetail() {
       >
         <div className="container mx-auto px-4 py-20 text-center">
           <p className="text-darkTeal mb-4">Recipe not found</p>
-          <Button onClick={() => navigate("/my-recipes")}>
-            Back to My Recipes
-          </Button>
+          <Button onClick={() => navigate("/my-recipes")}>Back to My Recipes</Button>
         </div>
       </Layout>
     );
   }
 
+  const defaultImage = `${import.meta.env.BASE_URL}recipes/recipe-default.jpg`;
+
   const imageUrl = recipe.imagePath
     ? `${import.meta.env.VITE_API_URL?.replace("/api", "")}${recipe.imagePath}`
-    : null;
+    : defaultImage;
 
   return (
     <Layout
@@ -165,20 +161,13 @@ export default function RecipeDetail() {
       <div className="min-h-screen bg-light">
         {/* Hero Image Section */}
         <div className="relative h-96 bg-gradient-to-br from-primary/30 to-secondary/30">
-          {imageUrl ? (
-            <>
-              <img
-                src={imageUrl}
-                alt={recipe.title}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-dark/80 to-transparent" />
-            </>
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <ChefHat size={120} className="text-primary/40" />
-            </div>
-          )}
+          <img
+            src={imageUrl}
+            alt={recipe.title ?? "Recipe image"}
+            className="w-full h-full object-cover"
+            loading="eager" // hero image you might want eager, or keep lazy if you prefer
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-dark/80 to-transparent" />
 
           {/* Title Overlay */}
           <div className="absolute bottom-0 left-0 right-0 p-8">
@@ -219,10 +208,7 @@ export default function RecipeDetail() {
               <Clock className="text-darkTeal" size={20} />
               <div className="text-center">
                 <p className="text-sm text-darkTeal/70">
-                  Prep Time:{" "}
-                  <span className="font-bold text-darkTeal">
-                    {recipe.prepTime} min
-                  </span>
+                  Prep Time: <span className="font-bold text-darkTeal">{recipe.prepTime} min</span>
                 </p>
               </div>
             </div>
@@ -231,10 +217,7 @@ export default function RecipeDetail() {
               <ChefHat className="text-darkTeal" size={20} />
               <div className="text-center">
                 <p className="text-sm text-darkTeal/70">
-                  Cook Time:{" "}
-                  <span className="font-bold text-darkTeal">
-                    {recipe.cookTime} min
-                  </span>
+                  Cook Time: <span className="font-bold text-darkTeal">{recipe.cookTime} min</span>
                 </p>
               </div>
             </div>
@@ -243,10 +226,7 @@ export default function RecipeDetail() {
               <Users className="text-darkTeal" size={20} />
               <div className="text-center">
                 <p className="text-sm text-darkTeal/70">
-                  Servings:{" "}
-                  <span className="font-bold text-darkTeal">
-                    {recipe.servings}
-                  </span>
+                  Servings: <span className="font-bold text-darkTeal">{recipe.servings}</span>
                 </p>
               </div>
             </div>
@@ -275,16 +255,12 @@ export default function RecipeDetail() {
                     <h2 className="font-display text-2xl font-bold text-darkTeal mb-3 italic">
                       About this Recipe
                     </h2>
-                    <p className="text-darkTeal leading-relaxed">
-                      {recipe.description}
-                    </p>
+                    <p className="text-darkTeal leading-relaxed">{recipe.description}</p>
                   </div>
                 )}
 
                 {/* Divider */}
-                {recipe.description && (
-                  <div className="border-t border-primary/30"></div>
-                )}
+                {recipe.description && <div className="border-t border-primary/30"></div>}
 
                 {/* Instructions */}
                 <div>
@@ -304,12 +280,10 @@ export default function RecipeDetail() {
             <div className="md:col-span-1">
               {/* Ingredients Box */}
               <div className="bg-primary rounded-lg p-6 border border-primary/20 sticky top-4">
-                <h2 className="font-display text-2xl font-bold text-light mb-4">
-                  Ingredients
-                </h2>
+                <h2 className="font-display text-2xl font-bold text-light mb-4">Ingredients</h2>
                 {recipe.ingredients && recipe.ingredients.length > 0 ? (
                   <ul className="space-y-3">
-                    {recipe.ingredients.map((ingredient) => {
+                    {(recipe.ingredients as IngredientLike[]).map((ingredient) => {
                       const qtyText = formatQuantity(ingredient);
                       return (
                         <li
@@ -323,11 +297,7 @@ export default function RecipeDetail() {
                               aria-label={`Toggle ${ingredient.ingredientName}`}
                             />
                             <span className="group-has-[:checked]:line-through group-has-[:checked]:opacity-60 transition-all">
-                              {qtyText ? (
-                                <span className="font-semibold">
-                                  {qtyText}{" "}
-                                </span>
-                              ) : null}
+                              {qtyText ? <span className="font-semibold">{qtyText} </span> : null}
                               {ingredient.ingredientName}
                             </span>
                           </label>
@@ -366,12 +336,9 @@ export default function RecipeDetail() {
       {showDeleteModal && (
         <div className="fixed inset-0 bg-dark/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg p-6 max-w-md w-full shadow-2xl">
-            <h3 className="font-display text-2xl font-bold text-dark mb-4">
-              Delete Recipe?
-            </h3>
+            <h3 className="font-display text-2xl font-bold text-dark mb-4">Delete Recipe?</h3>
             <p className="text-dark/60 mb-6">
-              Are you sure you want to delete "{recipe.title}"? This action
-              cannot be undone.
+              Are you sure you want to delete "{recipe.title}"? This action cannot be undone.
             </p>
             <div className="flex gap-3">
               <Button
@@ -382,12 +349,7 @@ export default function RecipeDetail() {
               >
                 Cancel
               </Button>
-              <Button
-                variant="danger"
-                onClick={handleDelete}
-                disabled={isDeleting}
-                fullWidth
-              >
+              <Button variant="danger" onClick={handleDelete} disabled={isDeleting} fullWidth>
                 {isDeleting ? "Deleting..." : "Delete"}
               </Button>
             </div>

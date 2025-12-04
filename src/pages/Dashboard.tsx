@@ -1,13 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  BookOpen,
-  Clock,
-  ChefHat,
-  Edit,
-  KeyRound,
-  Utensils,
-} from "lucide-react";
+import { BookOpen, Clock, ChefHat, Edit, KeyRound, Utensils } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import Layout from "../components/layout/Layout";
 import PageHeading from "../components/layout/PageHeading";
@@ -59,11 +52,7 @@ export default function Dashboard() {
   }, []);
 
   // Handle profile update
-  const handleUpdateProfile = async (
-    userName: string,
-    email: string,
-    avatarColor: string
-  ) => {
+  const handleUpdateProfile = async (userName: string, email: string, avatarColor: string) => {
     try {
       await api.put("/profile", { userName, email, avatarColor });
 
@@ -80,7 +69,7 @@ export default function Dashboard() {
 
       toast.success("Profile updated successfully!");
       window.location.reload();
-    } catch (error: any) {
+    } catch (error: unknown) {
       const message = extractErrorMessage(error, "Failed to update profile");
       toast.error(message);
       throw error;
@@ -88,14 +77,11 @@ export default function Dashboard() {
   };
 
   // Handle password change
-  const handleChangePassword = async (
-    currentPassword: string,
-    newPassword: string
-  ) => {
+  const handleChangePassword = async (currentPassword: string, newPassword: string) => {
     try {
       await api.put("/profile/password", { currentPassword, newPassword });
       toast.success("Password changed successfully!");
-    } catch (error: any) {
+    } catch (error: unknown) {
       const message = extractErrorMessage(error, "Failed to change password");
       toast.error(message);
       throw error;
@@ -148,23 +134,14 @@ export default function Dashboard() {
                   <div className="bg-primary/20 p-4 rounded-full mb-4">
                     <Utensils size={28} className="text-darkTeal" />
                   </div>
-                  <h3 className="text-darkTeal text-sm font-medium mb-3">
-                    Recipes by Category
-                  </h3>
+                  <h3 className="text-darkTeal text-sm font-medium mb-3">Recipes by Category</h3>
                   <div className="w-full space-y-1">
-                    {Object.entries(stats.recipesByCategory).map(
-                      ([category, count]) => (
-                        <div
-                          key={category}
-                          className="flex justify-between text-sm"
-                        >
-                          <span className="text-darkTeal/80">{category}</span>
-                          <span className="font-bold text-darkTeal/80">
-                            {count}
-                          </span>
-                        </div>
-                      )
-                    )}
+                    {Object.entries(stats.recipesByCategory).map(([category, count]) => (
+                      <div key={category} className="flex justify-between text-sm">
+                        <span className="text-darkTeal/80">{category}</span>
+                        <span className="font-bold text-darkTeal/80">{count}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -201,12 +178,9 @@ export default function Dashboard() {
                             </div>
                           )}
                           <div>
-                            <p className="font-semibold text-darkTeal text-lg">
-                              {recipe.title}
-                            </p>
+                            <p className="font-semibold text-darkTeal text-lg">{recipe.title}</p>
                             <p className="text-sm text-darkTeal">
-                              {recipe.categoryName} • {recipe.cookTime} min cook
-                              time
+                              {recipe.categoryName} • {recipe.cookTime} min cook time
                             </p>
                           </div>
                         </div>
@@ -218,9 +192,7 @@ export default function Dashboard() {
                   </div>
                 ) : (
                   <div className="text-center py-8">
-                    <p className="text-darkTeal mb-4">
-                      No recipes yet. Create your first recipe!
-                    </p>
+                    <p className="text-darkTeal mb-4">No recipes yet. Create your first recipe!</p>
                     <Button
                       variant="secondary"
                       onClick={() => navigate("/create-recipe")}
@@ -246,9 +218,7 @@ export default function Dashboard() {
                     size="xl"
                     className="mb-4"
                   />
-                  <h4 className="font-semibold text-darkTeal text-lg mb-1">
-                    {user.userName}
-                  </h4>
+                  <h4 className="font-semibold text-darkTeal text-lg mb-1">{user.userName}</h4>
                   <p className="text-darkTeal/60 text-sm mb-4">{user.email}</p>
                 </div>
 

@@ -11,11 +11,7 @@ interface EditProfileModalProps {
   currentUserName: string;
   currentEmail: string;
   currentAvatarColor: string;
-  onSave: (
-    userName: string,
-    email: string,
-    avatarColor: string
-  ) => Promise<void>;
+  onSave: (userName: string, email: string, avatarColor: string) => Promise<void>;
 }
 
 // Avatar color options
@@ -94,10 +90,7 @@ export default function EditProfileModal({
   return (
     <Dialog open={isOpen} onClose={handleClose} className="relative z-50">
       {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-dark/60 backdrop-blur-sm"
-        aria-hidden="true"
-      />
+      <div className="fixed inset-0 bg-dark/60 backdrop-blur-sm" aria-hidden="true" />
 
       {/* Modal container */}
       <div className="fixed inset-0 flex items-center justify-center p-4">
@@ -118,11 +111,7 @@ export default function EditProfileModal({
 
           {/* Avatar Preview */}
           <div className="flex justify-center mb-6">
-            <Avatar
-              userName={userName || "User"}
-              avatarColor={avatarColor}
-              size="xl"
-            />
+            <Avatar userName={userName || "User"} avatarColor={avatarColor} size="xl" />
           </div>
 
           {/* Form */}
@@ -149,9 +138,7 @@ export default function EditProfileModal({
 
             {/* Avatar Color Picker */}
             <div>
-              <label className="block text-sm font-medium text-dark mb-2">
-                Avatar Color
-              </label>
+              <label className="block text-sm font-medium text-dark mb-2">Avatar Color</label>
               <div className="grid grid-cols-6 gap-2">
                 {AVATAR_COLORS.map((color) => (
                   <button
@@ -160,9 +147,7 @@ export default function EditProfileModal({
                     onClick={() => setAvatarColor(color)}
                     disabled={isLoading}
                     className={`w-10 h-10 rounded-full transition-transform hover:scale-110 ${
-                      avatarColor === color
-                        ? "ring-4 ring-primary ring-offset-2"
-                        : ""
+                      avatarColor === color ? "ring-4 ring-primary ring-offset-2" : ""
                     }`}
                     style={{ backgroundColor: color }}
                   />
@@ -180,12 +165,7 @@ export default function EditProfileModal({
               >
                 Cancel
               </Button>
-              <Button
-                type="submit"
-                variant="primary"
-                disabled={isLoading}
-                fullWidth
-              >
+              <Button type="submit" variant="primary" disabled={isLoading} fullWidth>
                 {isLoading ? "Saving..." : "Save Changes"}
               </Button>
             </div>

@@ -27,19 +27,14 @@ const AVATAR_COLORS = [
   "#FD79A8",
 ];
 
-export default function RegisterModal({
-  isOpen,
-  onClose,
-  onSwitchToLogin,
-}: RegisterModalProps) {
+export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: RegisterModalProps) {
   const { register } = useAuth();
   const [formData, setFormData] = useState({
     userName: "",
     email: "",
     password: "",
     confirmPassword: "",
-    avatarColor:
-      AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)],
+    avatarColor: AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)],
   });
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({
@@ -111,8 +106,7 @@ export default function RegisterModal({
         email: "",
         password: "",
         confirmPassword: "",
-        avatarColor:
-          AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)],
+        avatarColor: AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)],
       });
     } catch (error) {
       // Error toast is shown in AuthContext
@@ -129,8 +123,7 @@ export default function RegisterModal({
         email: "",
         password: "",
         confirmPassword: "",
-        avatarColor:
-          AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)],
+        avatarColor: AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)],
       });
       setErrors({
         userName: "",
@@ -145,10 +138,7 @@ export default function RegisterModal({
   return (
     <Dialog open={isOpen} onClose={handleClose} className="relative z-50">
       {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-dark/60 backdrop-blur-sm"
-        aria-hidden="true"
-      />
+      <div className="fixed inset-0 bg-dark/60 backdrop-blur-sm" aria-hidden="true" />
 
       {/* Modal container */}
       <div className="fixed inset-0 flex items-center justify-center p-4">
@@ -166,9 +156,7 @@ export default function RegisterModal({
           <DialogTitle className="font-display text-3xl font-bold mb-2 text-dark">
             Join Savory
           </DialogTitle>
-          <p className="text-dark/70 mb-6 text-sm">
-            Create your account and start cooking
-          </p>
+          <p className="text-dark/70 mb-6 text-sm">Create your account and start cooking</p>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -177,9 +165,7 @@ export default function RegisterModal({
               label="Username"
               placeholder="Choose a username"
               value={formData.userName}
-              onChange={(e) =>
-                setFormData({ ...formData, userName: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, userName: e.target.value })}
               error={errors.userName}
               disabled={isLoading}
             />
@@ -189,9 +175,7 @@ export default function RegisterModal({
               label="Email"
               placeholder="your@email.com"
               value={formData.email}
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               error={errors.email}
               disabled={isLoading}
             />
@@ -201,9 +185,7 @@ export default function RegisterModal({
               label="Password"
               placeholder="Min. 6 characters"
               value={formData.password}
-              onChange={(e) =>
-                setFormData({ ...formData, password: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               error={errors.password}
               disabled={isLoading}
             />
@@ -213,9 +195,7 @@ export default function RegisterModal({
               label="Confirm Password"
               placeholder="Re-enter your password"
               value={formData.confirmPassword}
-              onChange={(e) =>
-                setFormData({ ...formData, confirmPassword: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
               error={errors.confirmPassword}
               disabled={isLoading}
             />
@@ -230,14 +210,10 @@ export default function RegisterModal({
                   <button
                     key={color}
                     type="button"
-                    onClick={() =>
-                      setFormData({ ...formData, avatarColor: color })
-                    }
+                    onClick={() => setFormData({ ...formData, avatarColor: color })}
                     disabled={isLoading}
                     className={`w-10 h-10 rounded-full transition-transform hover:scale-110 ${
-                      formData.avatarColor === color
-                        ? "ring-4 ring-primary ring-offset-2"
-                        : ""
+                      formData.avatarColor === color ? "ring-4 ring-primary ring-offset-2" : ""
                     }`}
                     style={{ backgroundColor: color }}
                   />
@@ -245,12 +221,7 @@ export default function RegisterModal({
               </div>
             </div>
 
-            <Button
-              type="submit"
-              variant="primary"
-              fullWidth
-              disabled={isLoading}
-            >
+            <Button type="submit" variant="primary" fullWidth disabled={isLoading}>
               {isLoading ? "Creating Account..." : "Sign Up"}
             </Button>
           </form>

@@ -5,8 +5,8 @@ export default function Footer() {
     <footer className="bg-darkTeal text-light py-6 mt-auto">
       <div className="container mx-auto px-4 text-center">
         <p className="text-sm">
-          © <span className="font-display text-lg italic">Savory</span> - Your
-          personal Recipe Manager
+          © <span className="font-display text-lg italic">Savory</span> - Your personal Recipe
+          Manager
         </p>
         <p className="text-xs mt-1 flex items-center justify-center gap-1">
           Built with

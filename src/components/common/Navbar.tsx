@@ -9,11 +9,7 @@ interface NavbarProps {
   onLogout: () => void;
 }
 
-export default function Navbar({
-  userName,
-  avatarColor = "#FBD180",
-  onLogout,
-}: NavbarProps) {
+export default function Navbar({ userName, avatarColor = "#FBD180", onLogout }: NavbarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const navLinkClass = ({ isActive }: { isActive: boolean }) =>
@@ -23,9 +19,7 @@ export default function Navbar({
 
   const mobileNavLinkClass = ({ isActive }: { isActive: boolean }) =>
     `flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-      isActive
-        ? "bg-light/10 text-secondary font-semibold"
-        : "text-light hover:bg-light/10"
+      isActive ? "bg-light/10 text-secondary font-semibold" : "text-light hover:bg-light/10"
     }`;
 
   return (
@@ -65,9 +59,7 @@ export default function Navbar({
       {/* Mobile: Hamburger Button */}
       <div className="md:hidden flex items-center gap-3">
         {/* User Avatar on Mobile */}
-        {userName && (
-          <Avatar userName={userName} avatarColor={avatarColor} size="sm" />
-        )}
+        {userName && <Avatar userName={userName} avatarColor={avatarColor} size="sm" />}
 
         {/* Hamburger Menu Button */}
         <button

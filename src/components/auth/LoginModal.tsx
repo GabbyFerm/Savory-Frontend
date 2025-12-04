@@ -11,11 +11,7 @@ interface LoginModalProps {
   onSwitchToRegister: () => void;
 }
 
-export default function LoginModal({
-  isOpen,
-  onClose,
-  onSwitchToRegister,
-}: LoginModalProps) {
+export default function LoginModal({ isOpen, onClose, onSwitchToRegister }: LoginModalProps) {
   const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -67,10 +63,7 @@ export default function LoginModal({
   return (
     <Dialog open={isOpen} onClose={handleClose} className="relative z-50">
       {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-dark/60 backdrop-blur-sm"
-        aria-hidden="true"
-      />
+      <div className="fixed inset-0 bg-dark/60 backdrop-blur-sm" aria-hidden="true" />
 
       {/* Modal container */}
       <div className="fixed inset-0 flex items-center justify-center p-4">
@@ -88,9 +81,7 @@ export default function LoginModal({
           <DialogTitle className="font-display text-3xl font-bold mb-2 text-dark">
             Welcome Back
           </DialogTitle>
-          <p className="text-dark/70 mb-6 text-sm">
-            Login to access your recipes
-          </p>
+          <p className="text-dark/70 mb-6 text-sm">Login to access your recipes</p>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -114,12 +105,7 @@ export default function LoginModal({
               disabled={isLoading}
             />
 
-            <Button
-              type="submit"
-              variant="primary"
-              fullWidth
-              disabled={isLoading}
-            >
+            <Button type="submit" variant="primary" fullWidth disabled={isLoading}>
               {isLoading ? "Logging in..." : "Login"}
             </Button>
           </form>

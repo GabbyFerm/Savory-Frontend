@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { PlusCircle, Search, ChefHat } from "lucide-react";
+import { PlusCircle, Search } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import Layout from "../components/layout/Layout";
 import PageHeading from "../components/layout/PageHeading";
@@ -57,16 +57,19 @@ export default function MyRecipes() {
         params.append("pageNumber", currentPage.toString());
         params.append("pageSize", pageSize.toString());
 
-        const response = await api.get<PagedResult<Recipe>>(
-          `/recipe?${params.toString()}`
-        );
+        const response = await api.get<PagedResult<Recipe>>(`/recipe?${params.toString()}`);
 
         setRecipes(response.data.items);
         setTotalPages(response.data.totalPages);
         setTotalCount(response.data.totalCount);
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error("❌ Failed to fetch recipes:", error);
-        console.error("❌ Error details:", error.response?.data);
+        if (error && typeof error === "object" && "response" in error) {
+          console.error(
+            "❌ Error details:",
+            (error as { response?: { data?: unknown } }).response?.data
+          );
+        }
         toast.error("Failed to load recipes");
       } finally {
         setIsLoading(false);
@@ -86,8 +89,7 @@ export default function MyRecipes() {
     };
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
-    return () =>
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
   }, []);
 
   // Reset to page 1 when search or sort changes
@@ -101,6 +103,17 @@ export default function MyRecipes() {
   };
 
   if (!user) return null;
+
+  const defaultImage = `${import.meta.env.BASE_URL}recipes/recipe-default.jpg`;
+
+  // helper: resolve absolute vs relative image paths
+  const resolveImageUrl = (path?: string | null) => {
+    if (!path) return defaultImage;
+    // if path already looks like an absolute/remote URL, return it
+    if (/^(https?:)?\/\//.test(path)) return path;
+    // otherwise assume it's the server-relative path returned by the API
+    return `${import.meta.env.VITE_API_URL?.replace("/api", "")}${path}`;
+  };
 
   return (
     <Layout
@@ -116,9 +129,7 @@ export default function MyRecipes() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 pb-5">
           {/* Sort By Buttons */}
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-darkTeal font-display text-2xl italic mr-2">
-              Sort by:
-            </span>
+            <span className="text-darkTeal font-display text-2xl italic mr-2">Sort by:</span>
 
             <button
               onClick={() => setSortBy("title")}
@@ -227,11 +238,8 @@ export default function MyRecipes() {
             {/* Recipe List */}
             <div className="space-y-4">
               {recipes.map((recipe) => {
-                const imageUrl = recipe.imagePath
-                  ? `${import.meta.env.VITE_API_URL?.replace("/api", "")}${
-                      recipe.imagePath
-                    }`
-                  : null;
+                // compute the URL here (before the JSX)
+                const imageUrl = resolveImageUrl(recipe.imagePath);
 
                 return (
                   <div
@@ -241,17 +249,16 @@ export default function MyRecipes() {
                   >
                     {/* Image wrapper */}
                     <div className="w-full h-36 md:w-80 md:h-full flex-shrink-0 bg-gradient-to-br from-primary/20 to-secondary/20 max-h-[144px] md:max-h-[140px] overflow-hidden">
-                      {imageUrl ? (
-                        <img
-                          src={imageUrl}
-                          alt={recipe.title}
-                          className="w-full h-full object-cover block"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <ChefHat size={40} className="text-primary/40" />
-                        </div>
-                      )}
+                      <img
+                        src={imageUrl}
+                        alt={recipe.title ?? "Recipe image"}
+                        className="w-full h-full object-cover block"
+                        loading="lazy"
+                        onError={(e) => {
+                          const img = e.currentTarget as HTMLImageElement;
+                          if (img.src !== defaultImage) img.src = defaultImage;
+                        }}
+                      />
                     </div>
 
                     {/* Content */}
@@ -261,10 +268,9 @@ export default function MyRecipes() {
                       </h2>
 
                       <p className="text-sm text-darkTeal font-bold mb-2 leading-snug">
-                        CookTime: {recipe.cookTime || "No cook time available"}{" "}
-                        || PrepTime:{" "}
-                        {recipe.prepTime || "No prep time available"} ||
-                        Servings: {recipe.servings || "No servings available"}
+                        CookTime: {recipe.cookTime || "No cook time available"} || PrepTime:{" "}
+                        {recipe.prepTime || "No prep time available"} || Servings:{" "}
+                        {recipe.servings || "No servings available"}
                       </p>
 
                       <p className="text-base text-darkTeal line-clamp-2 leading-relaxed">

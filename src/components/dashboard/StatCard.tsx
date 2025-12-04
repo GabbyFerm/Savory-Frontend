@@ -7,12 +7,7 @@ interface StatCardProps {
   subtitle?: string;
 }
 
-export default function StatCard({
-  icon: Icon,
-  title,
-  value,
-  subtitle,
-}: StatCardProps) {
+export default function StatCard({ icon: Icon, title, value, subtitle }: StatCardProps) {
   return (
     <div className="bg-light rounded-2xl p-6 border border-secondary">
       {/* Centered Layout */}

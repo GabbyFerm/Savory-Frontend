@@ -34,9 +34,7 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
 
         {/* Category Badge */}
         <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full">
-          <span className="text-xs font-semibold text-darkTeal">
-            {recipe.categoryName}
-          </span>
+          <span className="text-xs font-semibold text-darkTeal">{recipe.categoryName}</span>
         </div>
       </div>
 
@@ -49,9 +47,7 @@ export default function RecipeCard({ recipe }: RecipeCardProps) {
 
         {/* Description */}
         {recipe.description && (
-          <p className="text-sm text-dark/60 mb-3 line-clamp-2">
-            {recipe.description}
-          </p>
+          <p className="text-sm text-dark/60 mb-3 line-clamp-2">{recipe.description}</p>
         )}
 
         {/* Meta Info */}

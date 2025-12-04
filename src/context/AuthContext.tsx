@@ -1,19 +1,8 @@
-import {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  type ReactNode,
-} from "react";
+import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import toast from "react-hot-toast";
-import type {
-  User,
-  AuthResponse,
-  LoginRequest,
-  RegisterRequest,
-} from "../types";
+import type { User, AuthResponse, LoginRequest, RegisterRequest } from "../types";
 import { extractErrorMessage } from "../utils/errorHandler";
 
 interface AuthContextType {
@@ -34,21 +23,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Auto-login on app load (if token exists)
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const storedUser = localStorage.getItem("user");
+    const initAuth = () => {
+      const token = localStorage.getItem("token");
+      const storedUser = localStorage.getItem("user");
 
-    if (token && storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (error) {
-        console.error("Failed to parse stored user:", error);
-        localStorage.removeItem("token");
-        localStorage.removeItem("refreshToken");
-        localStorage.removeItem("user");
+      if (token && storedUser) {
+        try {
+          const parsedUser = JSON.parse(storedUser);
+          setUser(parsedUser);
+        } catch (error) {
+          console.error("Failed to parse stored user:", error);
+          localStorage.removeItem("token");
+          localStorage.removeItem("refreshToken");
+          localStorage.removeItem("user");
+        }
       }
-    }
-    setIsLoading(false);
-  }, []);
+      setIsLoading(false);
+    };
+
+    initAuth();
+  }, []); // Empty dependency array - only run once on mount
 
   // Listen for storage changes AND periodic token check
   useEffect(() => {
@@ -102,11 +96,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       toast.success(`Welcome back, ${userData.userName}!`);
       navigate("/dashboard");
-    } catch (error: any) {
-      const message = extractErrorMessage(
-        error,
-        "Login failed. Please try again."
-      );
+    } catch (error: unknown) {
+      const message = extractErrorMessage(error, "Login failed. Please try again.");
       toast.error(message);
       throw error;
     }
@@ -126,11 +117,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       toast.success(`Welcome to Savory, ${newUser.userName}!`);
       navigate("/dashboard");
-    } catch (error: any) {
-      const message = extractErrorMessage(
-        error,
-        "Registration failed. Please try again."
-      );
+    } catch (error: unknown) {
+      const message = extractErrorMessage(error, "Registration failed. Please try again.");
       toast.error(message);
       throw error;
     }
@@ -166,6 +154,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
+/* react-refresh requires files that export components to only export components.
+   We export a hook here too — moving the hook to a separate file is ideal, but
+   to avoid refactor noise for now we disable the rule for this export only. */
+/* eslint-disable-next-line react-refresh/only-export-components */
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
