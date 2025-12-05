@@ -419,4 +419,4 @@ This project is for educational purposes as part of a school assignment.
 
 ---
 
-**Built with ❤️ using React, TypeScript, and Tailwind CSS.**
+**Built with ❤️ using React, TypeScript, and Tailwind CSS**
