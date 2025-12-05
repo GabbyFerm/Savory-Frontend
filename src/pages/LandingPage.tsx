@@ -36,7 +36,9 @@ export default function LandingPage() {
           </div>
 
           {/* Title */}
-          <h1 className="font-display text-9xl font-black mb-3 italic text-[#F5F5F5]">Savory</h1>
+          <h1 className="font-display text-5xl md:text-9xl font-black mb-3 italic text-[#F5F5F5]">
+            Savory
+          </h1>
           <p className="text-xl mb-12 font-light text-[#F5F5F5]">
             Your personal <span className="italic font-semibold">Recipe</span> Manager
           </p>
