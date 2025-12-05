@@ -1,0 +1,52 @@
+name: Auto Create Draft PR
+
+on:
+  push:
+    branches:
+      - develop # Triggers when you push to develop
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Fetch all history for proper PR creation
+
+      - name: Check if PR already exists
+        id: check-pr
+        run: |
+          PR_EXISTS=$(gh pr list --base main --head develop --json number --jq length)
+          echo "pr_exists=$PR_EXISTS" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Pull Request
+        if: steps.check-pr.outputs.pr_exists == '0'
+        run: |
+          gh pr create \
+            --base main \
+            --head develop \
+            --title "🚀 Release: Deploy to Production" \
+            --body "## Automatic Release PR
+
+          This PR was automatically created from the latest \`develop\` changes.
+
+          ### 🔍 Review Checklist
+          - [ ] Preview deployment looks good
+          - [ ] All CI checks pass  
+          - [ ] No breaking changes
+          - [ ] Ready for production
+
+          ### 🎯 What's Changed
+          See commits below for details.
+
+          ### 📦 Deployment
+          Vercel will create a preview deployment automatically.
+
+          **Merge this PR to deploy to production!** 🎉" \
+            --draft
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

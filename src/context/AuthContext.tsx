@@ -7,6 +7,7 @@ import { extractErrorMessage } from "../utils/errorHandler";
 
 interface AuthContextType {
   user: User | null;
+  setUser: (u: User | null) => void; // <-- added setter
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (credentials: LoginRequest) => Promise<void>;
@@ -44,7 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     initAuth();
   }, []); // Empty dependency array - only run once on mount
 
-  // Listen for storage changes AND periodic token check
+  // Keep localStorage in sync and listen for storage changes / periodic checks
   useEffect(() => {
     // Check if token is still valid periodically
     const checkAuth = () => {
@@ -81,6 +82,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       window.removeEventListener("storage", handleStorageChange);
     };
   }, [user, navigate]);
+
+  // Persist user -> localStorage whenever setUser is called
+  useEffect(() => {
+    if (user) {
+      try {
+        localStorage.setItem("user", JSON.stringify(user));
+      } catch {
+        // ignore
+      }
+    } else {
+      localStorage.removeItem("user");
+    }
+  }, [user]);
 
   // Login function
   const login = async (credentials: LoginRequest) => {
@@ -142,6 +156,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider
       value={{
         user,
+        setUser, // <-- expose setter here
         isAuthenticated: !!user,
         isLoading,
         login,
