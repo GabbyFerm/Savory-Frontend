@@ -15,7 +15,7 @@ import type { DashboardStats } from "../types";
 import { extractErrorMessage } from "../utils/errorHandler";
 
 export default function Dashboard() {
-  const { user, logout } = useAuth();
+  const { user, setUser, logout } = useAuth(); // <-- use setUser
   const navigate = useNavigate();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -54,21 +54,28 @@ export default function Dashboard() {
   // Handle profile update
   const handleUpdateProfile = async (userName: string, email: string, avatarColor: string) => {
     try {
-      await api.put("/profile", { userName, email, avatarColor });
+      // call server
+      const res = await api.put("/profile", { userName, email, avatarColor });
 
-      const storedUser = localStorage.getItem("user");
-      if (storedUser) {
-        const updatedUser = {
-          ...JSON.parse(storedUser),
+      // prefer server returned updated user, otherwise merge into local user object
+      const updatedUser =
+        res?.data ??
+        ({
+          ...(user ?? JSON.parse(localStorage.getItem("user") || "{}")),
           userName,
           email,
           avatarColor,
-        };
+        } as typeof user);
+
+      // update auth state (AuthContext persists to localStorage)
+      if (setUser) {
+        setUser(updatedUser);
+      } else {
         localStorage.setItem("user", JSON.stringify(updatedUser));
       }
 
       toast.success("Profile updated successfully!");
-      window.location.reload();
+      setEditProfileOpen(false); // close modal without reloading
     } catch (error: unknown) {
       const message = extractErrorMessage(error, "Failed to update profile");
       toast.error(message);
