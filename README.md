@@ -23,7 +23,7 @@ Modern, responsive React frontend for the Savory recipe management application. 
 
 Savory Frontend is a modern React application that provides an intuitive interface for managing personal recipes. Built as a multi-page application with React Router, users can create, edit, delete, and organize recipes with images, ingredients, and detailed instructions.
 
-**Live Demo:** [Coming Soon]
+**Live Demo:** [[Savory]](https://savory-frontend.vercel.app/)
 
 **Backend Repository:** [Savory-Backend](https://github.com/GabbyFerm/Savory-Backend)
 
